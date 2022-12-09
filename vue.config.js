@@ -1,3 +1,5 @@
+const Dotenv = require('dotenv-webpack');
+
 module.exports = {
   configureWebpack: {
     output: {
@@ -5,7 +7,10 @@ module.exports = {
     },
     optimization: {
       splitChunks: false
-    }
+    },
+    plugins: [
+      new Dotenv()
+    ]
   },
   filenameHashing: false,
   runtimeCompiler: true,

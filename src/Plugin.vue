@@ -1,18 +1,25 @@
 <template>
 	<div>
-		<input class="uk-width-1-1" v-model="imageText" />
-		<button @click="search">Search</button>
+		<SbFormItem :grouped="true" :isRequired="false">
+      <SbTextField name="imageText" v-model="imageText"/>
+      <SbButton size="small" variant="primary" @click="search">DALL-E it</SbButton>
+    </SbFormItem>
 	</div>
 </template>
-
 <script>
+
+import { SbTextField, SbButton, SbFormItem } from 'storyblok-design-system'
 import {signAsset} from './../utils/services'
 import {openai} from './../utils/openai'
 
 /* eslint-disable */ 
 export default {
 	mixins: [window.Storyblok.plugin],
-
+	components: {
+    SbTextField,
+		SbButton,
+		SbFormItem
+  },
 	data() {
 		return {
 			imageText:'',
@@ -69,3 +76,20 @@ export default {
 	}
 }
 </script>
+<style>
+.widget{
+  display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+}
+input{
+	font-size: 14px !important;
+}
+.sb-textfield {
+	width: 69% !important
+}
+.sb-button--small {
+	width: 32% !important;
+	font-size: 1.1em;
+}
+</style>

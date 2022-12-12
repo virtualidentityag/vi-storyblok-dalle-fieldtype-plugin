@@ -53,6 +53,7 @@ export default {
 			let fileToUpload = this.dataURLtoFile(_url, 'image');
 			let form = {filename: this.imageText+'.png', size: this.imageSize}
 			this.model.filename  = await signAsset(this.spaceId,form, fileToUpload)
+			this.imageText=""
 		},
 
 		async search() {	
@@ -90,6 +91,6 @@ input{
 }
 .sb-button--small {
 	width: 32% !important;
-	font-size: 1.1em;
+	font-size: 1.1em !important;
 }
 </style>

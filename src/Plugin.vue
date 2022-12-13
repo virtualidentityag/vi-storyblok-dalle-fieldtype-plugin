@@ -91,6 +91,9 @@ input{
 }
 .sb-button--small {
 	width: 32% !important;
-	font-size: 1.1em !important;
+	font-size: 1.0em !important;
+}
+.sb-form-item {
+  margin-bottom: 0px !important;
 }
 </style>

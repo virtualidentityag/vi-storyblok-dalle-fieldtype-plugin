@@ -1,14 +1,39 @@
 <template>
 	<div>
 		<SbFormItem :grouped="true" :isRequired="false">
+			<SbSelect
+				:value="aspectRatio"
+				v-model="aspectRatio"
+				label="Aspect ratio"
+				:options='aspectRatioOptions'
+			/>
+    </SbFormItem>
+		<SbFormItem :grouped="true" :isRequired="false">
       <SbTextField name="imageText" v-model="imageText"/>
       <SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
     </SbFormItem>
+		<footer>
+			<span>
+				Developed by
+				<a href="https://www.virtual-identity.com/" target="_blank"
+					>Virtual Identity AG,</a
+				>
+				a certified Storyblok Partner.
+			</span>
+			<div class="badge">
+				<a
+					href="https://github.com/virtualidentityag/vi-storyblok-dalle-fieldtype-plugin"
+					target="_blank"
+				>
+					<!-- <img src="./../assets/badge.svg" alt="Open Source" /> -->
+				</a>
+			</div>
+		</footer>
 	</div>
 </template>
 <script>
 
-import { SbTextField, SbButton, SbFormItem } from 'storyblok-design-system'
+import { SbTextField, SbButton, SbFormItem, SbSelect } from 'storyblok-design-system'
 import {signAsset} from './../utils/services'
 import {openai} from './../utils/openai'
 
@@ -18,14 +43,17 @@ export default {
 	components: {
     SbTextField,
 		SbButton,
-		SbFormItem
+		SbFormItem,
+		SbSelect
   },
 	data() {
 		return {
 			imageText:'',
 			url:'',
 			imageSize:'1024x1024',
-			loading: false
+			loading: false,
+			aspectRatio: "",
+			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}]
 		};
 	},
 	
@@ -97,6 +125,47 @@ input{
 	font-size: 1.0em !important;
 }
 .sb-form-item {
+  margin-bottom: 16px !important;
+}
+
+.sb-form-item:last-child {
   margin-bottom: 0px !important;
+}
+
+footer {
+	padding: 5px 0px;
+	box-sizing: border-box;
+	margin-top: 2px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+footer span {
+	font-size: 12px;
+	color: #00000099;
+	font-weight: 400;
+	line-height: 16px;
+}
+
+footer img {
+	width: 100px;
+}
+
+footer a {
+	text-decoration: none;
+	font-weight: 700;
+	color: #00000099;
+}
+
+.badge {
+	display: flex;
+	align-items: flex-end;
+	height: 6vh;
+	margin-top: 5px;
+}
+
+.sb-select-list{
+	padding: 11px 0 !important
 }
 </style>

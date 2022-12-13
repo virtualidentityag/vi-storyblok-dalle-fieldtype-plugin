@@ -2,7 +2,7 @@
 	<div>
 		<SbFormItem :grouped="true" :isRequired="false">
       <SbTextField name="imageText" v-model="imageText"/>
-      <SbButton size="small" variant="primary" @click="search">DALL-E it</SbButton>
+      <SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
     </SbFormItem>
 	</div>
 </template>
@@ -25,6 +25,7 @@ export default {
 			imageText:'',
 			url:'',
 			imageSize:'1024x1024',
+			loading: false
 		};
 	},
 	
@@ -52,11 +53,13 @@ export default {
 			let _url = 'data:image/png;base64,' + url
 			let fileToUpload = this.dataURLtoFile(_url, 'image');
 			let form = {filename: this.imageText+'.png', size: this.imageSize}
-			this.model.filename  = await signAsset(this.spaceId,form, fileToUpload)
-			this.imageText=""
+			this.model.filename = await signAsset(this.spaceId,form, fileToUpload)
+			this.imageText = ""
+			this.loading = false
 		},
 
 		async search() {	
+			this.loading = true;
 			const response = await openai.createImage({
 				prompt: this.imageText,
 				n: 1,

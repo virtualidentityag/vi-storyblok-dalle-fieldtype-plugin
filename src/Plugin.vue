@@ -2,7 +2,6 @@
 	<div>
 		<SbFormItem :grouped="true" :isRequired="false">
 			<SbSelect
-				:value="aspectRatio"
 				v-model="aspectRatio"
 				label="Aspect ratio"
 				:options='aspectRatioOptions'
@@ -25,7 +24,6 @@
 					href="https://github.com/virtualidentityag/vi-storyblok-dalle-fieldtype-plugin"
 					target="_blank"
 				>
-					<!-- <img src="./../assets/badge.svg" alt="Open Source" /> -->
 				</a>
 			</div>
 		</footer>
@@ -33,11 +31,13 @@
 </template>
 <script>
 
-import { SbTextField, SbButton, SbFormItem, SbSelect } from 'storyblok-design-system'
-import {signAsset} from './../utils/services'
-import {openai} from './../utils/openai'
-
 /* eslint-disable */ 
+
+import { SbTextField, SbButton, SbFormItem, SbSelect } from 'storyblok-design-system'
+import {createAssetsFolder, getAssetsFolder, signAsset} from './../utils/services'
+import {openai} from './../utils/openai'
+import { ASSET_FOLDER_NAME } from '../utils/constants'
+
 export default {
 	mixins: [window.Storyblok.plugin],
 	components: {
@@ -48,12 +48,14 @@ export default {
   },
 	data() {
 		return {
-			imageText:'',
+			imageText:'cat',
 			url:'',
 			imageSize:'1024x1024',
 			loading: false,
 			aspectRatio: "",
-			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}]
+			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
+			space_id: this.spaceid
+			// space_id: '185398'
 		};
 	},
 	
@@ -80,9 +82,15 @@ export default {
 		async downloadImage(url) {
 			let _url = 'data:image/png;base64,' + url
 			let fileToUpload = this.dataURLtoFile(_url, 'image');
-			let form = {filename: this.imageText+'.png', size: this.imageSize}
-			this.model.filename = await signAsset(this.spaceId,form, fileToUpload)
-			this.imageText = ""
+			let folders = await getAssetsFolder(this.space_id)
+      let assetFolder = folders.find(folder => folder.name === ASSET_FOLDER_NAME)
+
+      if(!assetFolder)
+        assetFolder = await createAssetsFolder(this.space_id)
+
+			let form = {filename: this.imageText+'.png', size: this.imageSize,  asset_folder_id: assetFolder.id}
+			this.model.filename = await signAsset(this.space_id,form, fileToUpload)
+			// this.imageText = ""
 			this.loading = false
 		},
 
@@ -116,20 +124,6 @@ export default {
 }
 input{
 	font-size: 14px !important;
-}
-.sb-textfield {
-	width: 69% !important
-}
-.sb-button--small {
-	width: 32% !important;
-	font-size: 1.0em !important;
-}
-.sb-form-item {
-  margin-bottom: 16px !important;
-}
-
-.sb-form-item:last-child {
-  margin-bottom: 0px !important;
 }
 
 footer {
@@ -165,7 +159,40 @@ footer a {
 	margin-top: 5px;
 }
 
-.sb-select-list{
-	padding: 11px 0 !important
+
+.sb-textfield {
+	width: 69% !important
 }
+.sb-button--small {
+	width: 32% !important;
+	font-size: 1.0em !important;
+}
+.sb-form-item:last-child {
+  margin-bottom: 0px !important;
+}
+.sb-select-list {
+    padding: 0px !important;
+}
+.sb-select-list__create, .sb-select-list__item {
+  font-size: 1.0em !important;
+}
+.sb-form-item--grouped .sb-form-item__body {
+  display: flex;
+  width: 98% !important;
+}
+.sb-select {
+  margin-top: 2px !important;
+}
+.sb-select-inner {
+  padding: 0px 0px 0px 10px !important;
+  font-size: 1.0em !important;
+}
+.sb-select-list__create, .sb-select-list__item {
+  padding: 5px 5px !important;
+}
+.sb-form-item {
+  margin-bottom: 16px!important;
+  padding: 0px 3px 0px 3px !important;
+}
+
 </style>

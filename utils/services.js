@@ -13,8 +13,8 @@ export const uploadAsset = async (spaceId, signed_response_object, fileBlob) => 
 	form.append('file', fileBlob);
 
 	const response =  await axios.post(signed_response_object.post_url, form)
-		.then( async (res) => {
-					return await Storyblok.get(`spaces/${spaceId}/assets/` + signed_response_object.id + '/finish_upload').then(response => {
+		.then( async () => {
+					return await Storyblok.get(`spaces/${spaceId}/assets/` + signed_response_object.id + '/finish_upload').then(() => {
 						return 'https://a.storyblok.com/' + signed_response_object.fields.key
 					}).catch(error => {
 						throw error

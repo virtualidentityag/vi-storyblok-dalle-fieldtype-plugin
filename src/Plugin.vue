@@ -48,14 +48,12 @@ export default {
   },
 	data() {
 		return {
-			imageText:'cat',
+			imageText:'',
 			url:'',
 			imageSize:'1024x1024',
 			loading: false,
 			aspectRatio: "",
 			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
-			space_id: this.spaceid
-			// space_id: '185398'
 		};
 	},
 	
@@ -80,16 +78,17 @@ export default {
 		},
 
 		async downloadImage(url) {
+    console.log('this.spaceId', this.spaceId)
 			let _url = 'data:image/png;base64,' + url
 			let fileToUpload = this.dataURLtoFile(_url, 'image');
-			let folders = await getAssetsFolder(this.space_id)
+			let folders = await getAssetsFolder(this.spaceId)
       let assetFolder = folders.find(folder => folder.name === ASSET_FOLDER_NAME)
 
       if(!assetFolder)
-        assetFolder = await createAssetsFolder(this.space_id)
+        assetFolder = await createAssetsFolder(this.spaceId)
 
 			let form = {filename: this.imageText+'.png', size: this.imageSize,  asset_folder_id: assetFolder.id}
-			this.model.filename = await signAsset(this.space_id,form, fileToUpload)
+			this.model.filename = await signAsset(this.spaceId,form, fileToUpload)
 			// this.imageText = ""
 			this.loading = false
 		},

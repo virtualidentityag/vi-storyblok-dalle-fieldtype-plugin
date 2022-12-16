@@ -1,0 +1,1 @@
+export const ASSET_FOLDER_NAME = "DALL-E"

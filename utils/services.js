@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ASSET_FOLDER_NAME } from "./constants";
 import Storyblok from "./Storyblok-config";
 
 /* eslint-disable */ 
@@ -34,4 +35,30 @@ export const signAsset = async (spaceId, form, fileBlob) => {
 	})
 	
 	return signedResponse
+}
+
+export const getAssetsFolder = async (spaceId) => {
+	const assetsFolder = await Storyblok.get(`spaces/${spaceId}/asset_folders/`, {})
+		.then(response => {
+			return response.data.asset_folders
+		}).catch(error => {
+			console.log(error)
+		})
+
+	console.log('assetsFolder', assetsFolder)
+
+	return assetsFolder
+}
+
+export const createAssetsFolder = async (spaceId) => {
+	const assetsFolder = await Storyblok.post(`spaces/${spaceId}/asset_folders/`, {
+		"asset_folder": {
+			"name": ASSET_FOLDER_NAME
+		}
+	}).then(response => {
+			return response.data.asset_folder
+		}).catch(error => {
+			console.log(error)
+	})
+	return assetsFolder
 }

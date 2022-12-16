@@ -78,7 +78,6 @@ export default {
 		},
 
 		async downloadImage(url) {
-    console.log('this.spaceId', this.spaceId)
 			let _url = 'data:image/png;base64,' + url
 			let fileToUpload = this.dataURLtoFile(_url, 'image');
 			let folders = await getAssetsFolder(this.spaceId)
@@ -170,7 +169,7 @@ footer a {
   margin-bottom: 0px !important;
 }
 .sb-select-list {
-    padding: 0px !important;
+  padding: 0px !important;
 }
 .sb-select-list__create, .sb-select-list__item {
   font-size: 1.0em !important;

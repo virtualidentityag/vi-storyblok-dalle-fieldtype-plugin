@@ -1,14 +1,14 @@
 <template>
 	<div>
-		<SbFormItem :grouped="true" :isRequired="false">
+		<!-- <SbFormItem :grouped="true" :isRequired="false">
 			<SbSelect
 				v-model="aspectRatio"
 				label="Aspect ratio"
 				:options='aspectRatioOptions'
 			/>
-    </SbFormItem>
-		<SbFormItem :grouped="true" :isRequired="false">
-      <SbTextField name="imageText" v-model="imageText"/>
+    </SbFormItem> -->
+		<SbFormItem :grouped="true">
+      <SbTextField name="imageText" v-model="imageText" required errorMessage="Image keyword is required" :error="this.error"/>
       <SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
     </SbFormItem>
 		<footer>
@@ -54,6 +54,7 @@ export default {
 			loading: false,
 			aspectRatio: "",
 			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
+			error: false
 		};
 	},
 	
@@ -93,15 +94,27 @@ export default {
 		},
 
 		async search() {	
-			this.loading = true;
-			const response = await openai.createImage({
-				prompt: this.imageText,
-				n: 1,
-				size: this.imageSize,
-				response_format:'b64_json'
-			});
-			this.downloadImage(response.data.data[0].b64_json)
-		}
+
+			if(this.imageText.trim().length === 0 )
+				this.error = true
+			else{
+				this.error = false
+				this.loading = true;
+
+				await openai.createImage({
+					prompt: this.imageText,
+					n: 1,
+					size: this.imageSize,
+					response_format:'b64_json'
+				}).then(response => {
+					this.downloadImage(response.data.data[0].b64_json)
+					return response
+				}).catch(error => {
+					this.loading = false;
+					return error
+				})
+			}
+		},
 	},
 
 	watch: {
@@ -122,6 +135,10 @@ export default {
 }
 input{
 	font-size: 14px !important;
+}
+
+.sb-textfield__input--error, .sb-textfield__textarea--error {
+    border: 1px solid #ff6159 !important;
 }
 
 footer {
@@ -164,6 +181,7 @@ footer a {
 .sb-button--small {
 	width: 32% !important;
 	font-size: 1.0em !important;
+	height: 42px !important;
 }
 .sb-form-item:last-child {
   margin-bottom: 0px !important;
@@ -171,7 +189,7 @@ footer a {
 .sb-select-list {
   padding: 0px !important;
 }
-.sb-select-list__create, .sb-select-list__item {
+.sb-textfield__message, .sb-select-list__create, .sb-select-list__item {
   font-size: 1.0em !important;
 }
 .sb-form-item--grouped .sb-form-item__body {
@@ -192,5 +210,4 @@ footer a {
   margin-bottom: 16px!important;
   padding: 0px 3px 0px 3px !important;
 }
-
 </style>

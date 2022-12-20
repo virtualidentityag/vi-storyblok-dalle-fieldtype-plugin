@@ -52,7 +52,7 @@ export default {
 			url:'',
 			imageSize:'1024x1024',
 			loading: false,
-			aspectRatio: "",
+			aspectRatio: "Aspect Ratio",
 			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
 		};
 	},
@@ -92,6 +92,13 @@ export default {
 			this.loading = false
 		},
 
+		calculateHeight(aspectRatio){
+			let splittedRatio = aspectRatio.split(':')
+			let ratio = Number(splittedRatio[0])/Number(splittedRatio[1])
+			let height = parseInt(1024/ratio)
+			this.imageSize = `1024x${height}`
+		},
+		
 		async search() {	
 			this.loading = true;
 			const response = await openai.createImage({
@@ -99,9 +106,15 @@ export default {
 				n: 1,
 				size: this.imageSize,
 				response_format:'b64_json'
-			});
+			}).then(response => {
+				return response
+			}).catch(error => {
+				this.loading = false;
+				return error
+			})
+
 			this.downloadImage(response.data.data[0].b64_json)
-		}
+		},
 	},
 
 	watch: {
@@ -110,6 +123,11 @@ export default {
 				this.$emit('changed-model', value);
 			},
 			deep: true
+		},
+		'aspectRatio': {
+			handler: function (value) {
+				this.calculateHeight(value)
+			},
 		}
 	}
 }

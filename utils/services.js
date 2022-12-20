@@ -32,6 +32,7 @@ export const signAsset = async (spaceId, form, fileBlob) => {
 			return uploadAsset(spaceId,response.data, fileBlob)
 		}).catch(error => {
 			console.log(error)
+			return error
 	})
 	
 	return signedResponse
@@ -43,6 +44,7 @@ export const getAssetsFolder = async (spaceId) => {
 			return response.data.asset_folders
 		}).catch(error => {
 			console.log(error)
+			return error
 		})
 
 	console.log('assetsFolder', assetsFolder)
@@ -59,6 +61,7 @@ export const createAssetsFolder = async (spaceId) => {
 			return response.data.asset_folder
 		}).catch(error => {
 			console.log(error)
+			return error
 	})
 	return assetsFolder
 }

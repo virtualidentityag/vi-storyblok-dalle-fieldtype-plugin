@@ -31,9 +31,9 @@
 </template>
 <script>
 
-/* eslint-disable */ 
+// /* eslint-disable */ 
 
-import { SbTextField, SbButton, SbFormItem, SbSelect } from 'storyblok-design-system'
+import { SbTextField, SbButton, SbFormItem } from 'storyblok-design-system'
 import {createAssetsFolder, getAssetsFolder, signAsset} from './../utils/services'
 import {openai} from './../utils/openai'
 import { ASSET_FOLDER_NAME } from '../utils/constants'
@@ -44,7 +44,6 @@ export default {
     SbTextField,
 		SbButton,
 		SbFormItem,
-		SbSelect
   },
 	data() {
 		return {

@@ -1,16 +1,12 @@
 <template>
 	<div>
-		<!-- <SbFormItem :grouped="true" :isRequired="false">
-			<SbSelect
-				v-model="aspectRatio"
-				label="Aspect ratio"
-				:options='aspectRatioOptions'
-			/>
-    </SbFormItem> -->
-		<SbFormItem :grouped="true">
+		<SbFormItem>
       <SbTextField name="imageText" v-model="imageText" required errorMessage="Image keyword is required" :error="this.error"/>
-      <SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
     </SbFormItem>
+		<div class="row">
+			<SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
+			<SbButton :isDisabled="disableAlternate" :isLoading="loadingAlternate" size="small" variant="primary" @click="getNextAlternative()">Get Next Alternate</SbButton>
+		</div>
 		<footer>
 			<span>
 				Developed by
@@ -48,9 +44,12 @@ export default {
 	data() {
 		return {
 			imageText:'',
-			url:'',
+			results:[],
+			current:0,
 			imageSize:'1024x1024',
 			loading: false,
+			loadingAlternate: false,
+			disableAlternate:true,
 			aspectRatio: "",
 			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
 			error: false
@@ -77,6 +76,21 @@ export default {
 			return new File([u8arr], filename, {type:mime});
 		},
 
+		getNextAlternative(){
+			this.loadingAlternate = true;
+
+			if(this.current !== 9){
+				this.current +=1;
+				if(this.current == 9){
+					this.disableAlternate = true;
+					this.loadingAlternate = false;
+					this.search();
+				}
+				else
+					this.downloadImage(this.results[this.current].b64_json)
+			}
+		},
+
 		async downloadImage(url) {
 			let _url = 'data:image/png;base64,' + url
 			let fileToUpload = this.dataURLtoFile(_url, 'image');
@@ -88,12 +102,11 @@ export default {
 
 			let form = {filename: this.imageText+'.png', size: this.imageSize,  asset_folder_id: assetFolder.id}
 			this.model.filename = await signAsset(this.spaceId,form, fileToUpload)
-			// this.imageText = ""
-			this.loading = false
+			this.loading = false;
+			this.loadingAlternate = false;
 		},
 
-		async search() {	
-
+		async search() {
 			if(this.imageText.trim().length === 0 )
 				this.error = true
 			else{
@@ -101,16 +114,14 @@ export default {
 				this.loading = true;
 
 				await openai.createImage({
-					prompt: this.imageText,
-					n: 1,
-					size: this.imageSize,
-					response_format:'b64_json'
+					prompt: this.imageText, n: 10,
+					size: this.imageSize, response_format:'b64_json'
 				}).then(response => {
+					this.disableAlternate = false
+					this.results = response.data.data
 					this.downloadImage(response.data.data[0].b64_json)
-					return response
-				}).catch(error => {
+				}).catch(() => {
 					this.loading = false;
-					return error
 				})
 			}
 		},
@@ -127,17 +138,17 @@ export default {
 }
 </script>
 <style>
-.widget{
+.row{
   display: flex;
 	flex-direction: row;
-	justify-content: space-around;
+	justify-content: space-between;
 }
 input{
 	font-size: 14px !important;
 }
 
 .sb-textfield__input--error, .sb-textfield__textarea--error {
-    border: 1px solid #ff6159 !important;
+  border: 1px solid #ff6159 !important;
 }
 
 footer {
@@ -173,14 +184,9 @@ footer a {
 	margin-top: 5px;
 }
 
-
-.sb-textfield {
-	width: 69% !important
-}
 .sb-button--small {
-	width: 32% !important;
+	width: 48% !important;
 	font-size: 1.0em !important;
-	height: 42px !important;
 }
 .sb-form-item:last-child {
   margin-bottom: 0px !important;
@@ -207,6 +213,5 @@ footer a {
 }
 .sb-form-item {
   margin-bottom: 16px!important;
-  padding: 0px 3px 0px 3px !important;
 }
 </style>

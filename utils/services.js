@@ -45,8 +45,6 @@ export const getAssetsFolder = async (spaceId) => {
 			console.log(error)
 		})
 
-	console.log('assetsFolder', assetsFolder)
-
 	return assetsFolder
 }
 

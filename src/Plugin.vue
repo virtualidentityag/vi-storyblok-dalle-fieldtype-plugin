@@ -27,12 +27,13 @@
 </template>
 <script>
 
-// /* eslint-disable */ 
+/* eslint-disable */ 
 
 import { SbTextField, SbButton, SbFormItem } from 'storyblok-design-system'
-import {createAssetsFolder, getAssetsFolder, signAsset} from './../utils/services'
+import {createAssetsFolder, fetchDataSourceEntries, getAssetsFolder, signAsset} from './../utils/services'
 import {openai} from './../utils/openai'
-import { ASSET_FOLDER_NAME } from '../utils/constants'
+import { ASSET_FOLDER_NAME, dataSourcesConstants } from '../utils/constants'
+import { getDSObj } from '../utils/utilities'
 
 export default {
 	mixins: [window.Storyblok.plugin],
@@ -52,15 +53,31 @@ export default {
 			disableAlternate:true,
 			aspectRatio: "",
 			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
-			error: false
+			error: false,
+			apiKey:'',
+			orgId:''
 		};
 	},
 	
+	async mounted(){
+		await this.initApp()
+	},
 	methods: {
 		initWith() {
 			return {
 				plugin: 'dall-e',
 				filename:''
+			}
+		},
+		async initApp() {
+			await this.initDataSources()
+		},
+
+		async initDataSources() {
+			let dataSourceObj = await fetchDataSourceEntries(this.spaceId);
+			if (dataSourceObj) {
+				this.apiKey = getDSObj(dataSourceObj, dataSourcesConstants.DALL_E_API_KEY_DATASOURCE_NAME).value
+				this.orgId = getDSObj(dataSourceObj, dataSourcesConstants.DALL_E_ORG_ID_DATASOURCE_NAME).value
 			}
 		},
 		
@@ -112,8 +129,7 @@ export default {
 			else{
 				this.error = false
 				this.loading = true;
-
-				await openai.createImage({
+				await openai(this.apiKey, this.orgId).createImage({
 					prompt: this.imageText, n: 10,
 					size: this.imageSize, response_format:'b64_json'
 				}).then(response => {

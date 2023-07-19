@@ -105,12 +105,6 @@ export const fetchDataSourceEntries = async (spaceId) => {
 	else
 		dataSourceEntryValues = datasourceEntries && datasourceEntries.data && datasourceEntries.data.datasource_entries ? datasourceEntries.data.datasource_entries : null;
 
-		// if (datasourceEntries) {
-		// 	dataSourceEntryValues = datasourceEntries.data.datasource_entries ?? null;
-		// }
-		// dataSourceEntryValues = datasourceEntries?.data?.datasource_entries ?? null;
-		// dataSourceEntryValues = datasourceEntries?.data?.datasource_entries ?? null;
-
 	return dataSourceEntryValues;
 }
 

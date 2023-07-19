@@ -1,35 +1,47 @@
 <template>
-	<div>
-		<SbFormItem>
-      <SbTextField name="imageText" v-model="imageText" required errorMessage="Image keyword is required" :error="this.error"/>
-    </SbFormItem>
-		<div class="row">
-			<SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
-			<SbButton :isDisabled="disableAlternate" :isLoading="loadingAlternate" size="small" variant="primary" @click="getNextAlternative()">Get Next Alternate</SbButton>
-		</div>
-		<footer>
-			<span>
-				Developed by
-				<a href="https://www.virtual-identity.com/" target="_blank"
-					>Virtual Identity AG,</a
-				>
-				a certified Storyblok Partner.
-			</span>
-			<div class="badge">
-				<a
-					href="https://github.com/virtualidentityag/vi-storyblok-dalle-fieldtype-plugin"
-					target="_blank"
-				>
-				</a>
+<div>
+	<SbLoading v-if="loadingContext" type="spinner" size="normal" color="primary" ui-block />
+	<div v-else>
+		<SbNotification
+      v-if="invalidApiKey&&invalidOrgId"
+      status="negative"
+      title="Missing configuration datasource."
+      description="Please enter your DALL-E ApiKey and Organization Id in Datasources"
+      is-full
+    />
+		<div v-else>
+			<SbFormItem>
+				<SbTextField name="imageText" v-model="imageText" required errorMessage="Image keyword is required" :error="this.error"/>
+			</SbFormItem>
+			<div class="row">
+				<SbButton :isLoading="loading" size="small" variant="primary" @click="search">DALL-E it</SbButton>
+				<SbButton :isDisabled="disableAlternate" :isLoading="loadingAlternate" size="small" variant="primary" @click="getNextAlternative()">Get Next Alternate</SbButton>
 			</div>
-		</footer>
+			<footer>
+				<span>
+					Developed by
+					<a href="https://www.virtual-identity.com/" target="_blank"
+						>Virtual Identity AG,</a
+					>
+					a certified Storyblok Partner.
+				</span>
+				<div class="badge">
+					<a
+						href="https://github.com/virtualidentityag/vi-storyblok-dalle-fieldtype-plugin"
+						target="_blank"
+					>
+					</a>
+				</div>
+			</footer>
+		</div>
 	</div>
+</div>
 </template>
 <script>
 
 /* eslint-disable */ 
 
-import { SbTextField, SbButton, SbFormItem } from 'storyblok-design-system'
+import { SbLoading, SbNotification,SbTextField, SbButton, SbFormItem } from 'storyblok-design-system'
 import {createAssetsFolder, fetchDataSourceEntries, getAssetsFolder, signAsset} from './../utils/services'
 import {openai} from './../utils/openai'
 import { ASSET_FOLDER_NAME, dataSourcesConstants } from '../utils/constants'
@@ -38,9 +50,11 @@ import { getDSObj } from '../utils/utilities'
 export default {
 	mixins: [window.Storyblok.plugin],
 	components: {
-    SbTextField,
 		SbButton,
+		SbLoading,
 		SbFormItem,
+    SbTextField,
+		SbNotification,
   },
 	data() {
 		return {
@@ -55,7 +69,10 @@ export default {
 			aspectRatioOptions: [ {"label": "16:9","value": '16:9'},{"label": "1:1","value": '1:1'},{"label": "4:3","value": '4:3'}],
 			error: false,
 			apiKey:'',
-			orgId:''
+			invalidApiKey:false,
+			orgId:'',
+			invalidOrgId:false,
+			loadingContext:true
 		};
 	},
 	
@@ -78,6 +95,10 @@ export default {
 			if (dataSourceObj) {
 				this.apiKey = getDSObj(dataSourceObj, dataSourcesConstants.DALL_E_API_KEY_DATASOURCE_NAME).value
 				this.orgId = getDSObj(dataSourceObj, dataSourcesConstants.DALL_E_ORG_ID_DATASOURCE_NAME).value
+
+				this.loadingContext = false
+				this.invalidApiKey = this.apiKey === dataSourcesConstants.DALL_E_API_KEY_INITIAL_VALUE ? true : false
+				this.invalidOrgId = this.orgId === dataSourcesConstants.DALL_E_ORG_ID_INITIAL_VALUE ? true : false
 			}
 		},
 		
@@ -229,5 +250,11 @@ footer a {
 }
 .sb-form-item {
   margin-bottom: 16px!important;
+}
+.sb-notification--title {
+	font-size: 1.0rem !important;
+}
+.sb-notification--description {
+  font-size: 1.0rem !important;
 }
 </style>

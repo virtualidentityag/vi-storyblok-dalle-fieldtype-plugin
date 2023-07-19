@@ -5,8 +5,8 @@ export const dataSourcesConstants = {
   APP_DATASOURCE_SLUG: "dall-e",
 
   DALL_E_API_KEY_DATASOURCE_NAME: 'DALL-E-API-KEY',
-  DALL_E_API_KEY_INITIAL_VALUE: process.env.API_KEY,
+  DALL_E_API_KEY_INITIAL_VALUE: 'Enter-DALL-E-Api-Key-Here',
 
   DALL_E_ORG_ID_DATASOURCE_NAME: 'DALL-E-ORG-ID',
-  DALL_E_ORG_ID_INITIAL_VALUE: process.env.ORG_ID,
+  DALL_E_ORG_ID_INITIAL_VALUE: 'Enter-Organisation-Id-Here',
 }

@@ -1,10 +1,10 @@
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
 
 
 export const openai = (apiKey, orgId) => {
-  const configuration = new Configuration({
+  
+  return new OpenAI({
     organization: orgId,
     apiKey: apiKey,
   });
-  return new OpenAIApi(configuration);
 }
